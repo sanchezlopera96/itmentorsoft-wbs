@@ -3,88 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestor WBS · Tutor Inteligente ITM</title>
+<title>WBS / EDT · Tutor Inteligente ITM</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#1f2433; --muted:#616a7d; --line:#c3cbda; --paper:#f7f8fb; --card:#fff;
-    --c1:#4f46b8; --c1t:#eceafb; --c2:#0d8f8a; --c2t:#e2f4f2;
-    --c3:#8a4fd6; --c3t:#f0e9fb; --c4:#2f7bd6; --c4t:#e6f0fb;
-    --c5:#2f9e57; --c5t:#e5f5ea;
-    --accent:#4a41ab;
-  }
+  :root{--ink:#1f2433;--muted:#616a7d;--line:#c3cbda;--paper:#f7f8fb;--card:#fff;
+    --c1:#4f46b8;--c1t:#eceafb;--c2:#0d8f8a;--c2t:#e2f4f2;--c3:#8a4fd6;--c3t:#f0e9fb;--c4:#2f7bd6;--c4t:#e6f0fb;--c5:#2f9e57;--c5t:#e5f5ea;--accent:#4a41ab;}
   *{box-sizing:border-box;}
-  html,body{margin:0;background:var(--paper);color:var(--ink);
-    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
-  .wrap{max-width:1360px;margin:0 auto;padding:26px 26px 60px;}
-  .kicker{font-family:"Sora";font-weight:600;font-size:.8rem;color:var(--muted);margin:0 0 5px;}
-  h1{font-family:"Sora";font-weight:700;font-size:1.5rem;line-height:1.12;margin:0 0 4px;}
-  .sub{font-size:.86rem;color:var(--muted);max-width:80ch;line-height:1.45;margin:0 0 16px;}
-
-  /* toolbar */
-  .bar{position:sticky;top:0;z-index:20;background:var(--paper);
-    display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0 12px;
-    border-bottom:1px solid var(--line);margin-bottom:18px;}
-  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff;}
-  .seg button{border:0;background:#fff;padding:8px 14px;font:inherit;font-size:.82rem;cursor:pointer;color:var(--muted);}
-  .seg button.on{background:var(--accent);color:#fff;font-weight:600;}
-  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;
-    font:inherit;font-size:.82rem;cursor:pointer;color:var(--ink);display:inline-flex;gap:6px;align-items:center;}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  .wrap{max-width:1360px;margin:0 auto;padding:34px 30px 60px;}
+  .kicker{font-family:"Sora";font-weight:600;font-size:.8rem;color:var(--muted);margin:0 0 6px;}
+  h1{font-family:"Sora";font-weight:700;font-size:1.7rem;line-height:1.12;margin:0 0 8px;}
+  .sub{font-size:.9rem;color:var(--muted);max-width:78ch;line-height:1.5;margin:0;}
+  .topline{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:14px;}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.8rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:8px;}
+  .swatch{width:24px;height:13px;border-radius:4px;border:1px solid var(--line);}
+  .s0{background:linear-gradient(#eef0ff,#e3e6ff);border-color:#b9bffb;} .s1{background:#e9edf5;}
+  .s2{background:#fff;} .s3{background:#fff;border-style:dashed;}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font:inherit;font-size:.82rem;cursor:pointer;color:var(--ink);}
   .btn:hover{border-color:var(--accent);color:var(--accent);}
-  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .btn.primary:hover{filter:brightness(1.06);color:#fff;}
-  .btn.warn:hover{border-color:#c0392b;color:#c0392b;}
-  .spacer{flex:1 1 auto;}
-  .status{font-size:.76rem;color:var(--muted);white-space:nowrap;}
-  .status b{color:#1f6b3d;font-weight:600;}
+  .banner{margin:14px 0 0;font-size:.78rem;padding:9px 12px;border-radius:8px;background:#fff5e6;border:1px solid #f0c987;color:#8a5a00;display:none;}
+  .loading{color:var(--muted);font-size:.9rem;padding:40px 0;text-align:center;}
 
-  /* ---------- TABLE VIEW ---------- */
-  .tablecard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;}
-  table{border-collapse:collapse;width:100%;min-width:720px;font-size:.82rem;}
-  thead th{position:sticky;top:0;background:#1f2433;color:#fff;font-family:"Sora";font-weight:600;
-    text-align:left;padding:9px 10px;font-size:.76rem;}
-  tbody td{border-top:1px solid #eef0f5;padding:4px 8px;vertical-align:middle;}
-  tr.lvl1 td{background:var(--rowc);color:#fff;}
-  tr.lvl1 .code,tr.lvl1 input{color:#fff;}
-  tr.lvl2 td{background:var(--rowt);}
-  .code{font-family:"Sora";font-weight:600;white-space:nowrap;}
-  .lvlpill{display:inline-block;min-width:20px;text-align:center;font-size:.72rem;color:var(--muted);}
-  tr.lvl1 .lvlpill{color:#eee;}
-  input.name{width:100%;border:1px solid transparent;background:transparent;border-radius:6px;
-    padding:6px 8px;font:inherit;font-size:.82rem;color:inherit;}
-  input.name:focus{outline:none;border-color:var(--accent);background:#fff;color:var(--ink);}
-  td.indent{padding-left:calc(8px + var(--ind));}
-  .acts{display:flex;gap:3px;white-space:nowrap;}
-  .ic{border:1px solid var(--line);background:#fff;border-radius:6px;width:26px;height:26px;
-    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;color:var(--muted);padding:0;}
-  .ic:hover{border-color:var(--accent);color:var(--accent);}
-  .ic.del:hover{border-color:#c0392b;color:#c0392b;}
-  .ramacell{font-size:.74rem;color:var(--muted);white-space:nowrap;}
-  tr.lvl1 .ramacell{color:#f0f0f5;}
-
-  /* ---------- DIAGRAM VIEW ---------- */
-  #diagram{display:none;}
-  .project{max-width:540px;margin:6px auto 0;background:linear-gradient(180deg,#5b53c6,#4a41ab);
-    color:#fff;border-radius:16px;padding:14px 20px;text-align:center;box-shadow:0 10px 24px rgba(74,65,171,.28);}
+  .project{max-width:540px;margin:22px auto 0;background:linear-gradient(180deg,#5b53c6,#4a41ab);color:#fff;border-radius:16px;padding:15px 22px;text-align:center;box-shadow:0 10px 24px rgba(74,65,171,.28);}
   .project .c{font-family:"Sora";font-weight:600;font-size:.78rem;opacity:.85;}
-  .project .n{font-family:"Sora";font-weight:700;font-size:1.1rem;margin:2px 0 3px;}
-  .project .d{font-size:.8rem;opacity:.9;line-height:1.4;}
-  .trunk{width:2px;height:22px;background:var(--line);margin:0 auto;}
+  .project .n{font-family:"Sora";font-weight:700;font-size:1.15rem;margin:2px 0 3px;}
+  .project .d{font-size:.82rem;opacity:.9;line-height:1.4;}
+  .trunk{width:2px;height:24px;background:var(--line);margin:0 auto;}
   .rail{height:2px;background:var(--line);margin:0 12.5%;}
   .branches{display:grid;grid-template-columns:repeat(var(--ncols),minmax(250px,1fr));gap:20px;align-items:start;}
   .col{display:flex;flex-direction:column;position:relative;}
   .col::before{content:"";width:2px;height:16px;background:var(--line);position:absolute;top:-16px;left:50%;transform:translateX(-1px);}
   .l1{border-radius:12px;padding:11px 12px;color:#fff;display:flex;gap:9px;align-items:flex-start;box-shadow:0 5px 14px rgba(31,36,51,.14);}
-  .l1 .ico{font-size:1.15rem;line-height:1.15;}
-  .l1 .code{font-family:"Sora";font-weight:700;font-size:.95rem;}
+  .l1 .ico{font-size:1.15rem;line-height:1.15;} .l1 .code{font-family:"Sora";font-weight:700;font-size:.95rem;}
   .l1 .ttl{font-family:"Sora";font-weight:600;font-size:.86rem;line-height:1.2;margin-top:2px;}
   .items{display:flex;flex-direction:column;gap:8px;margin-top:11px;position:relative;}
   .items::before{content:"";position:absolute;top:-11px;bottom:15px;left:14px;width:2px;background:var(--line);}
   .l2wrap{position:relative;}
-  .l2{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--muted);
-    border-radius:8px;padding:7px 10px 7px 12px;font-size:.78rem;line-height:1.33;position:relative;margin-left:26px;}
+  .l2{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:8px;padding:7px 10px 7px 12px;font-size:.78rem;line-height:1.33;position:relative;margin-left:26px;}
   .l2::before{content:"";position:absolute;top:50%;left:-12px;width:12px;height:2px;background:var(--line);}
   .l2 b{font-family:"Sora";font-weight:600;display:block;font-size:.72rem;color:var(--muted);margin-bottom:1px;}
   .kids{margin:7px 0 2px 46px;display:flex;flex-direction:column;gap:6px;position:relative;}
@@ -97,259 +55,103 @@
   .b3 .l1{background:var(--c3);} .b3 .l2{border-left-color:var(--c3);background:var(--c3t);}
   .b4 .l1{background:var(--c4);} .b4 .l2{border-left-color:var(--c4);background:var(--c4t);}
   .b5 .l1{background:var(--c5);} .b5 .l2{border-left-color:var(--c5);background:var(--c5t);}
-
-  .hint{font-size:.75rem;color:var(--muted);line-height:1.5;margin-top:16px;border-top:1px solid var(--line);padding-top:12px;}
-  .hint b{color:var(--ink);font-family:"Sora";}
-
-  @media (max-width:1024px){ .branches{grid-template-columns:repeat(2,1fr);} .rail,.trunk,.col::before{display:none;} }
-  @media (max-width:560px){ .branches{grid-template-columns:1fr;} }
-  @media print{
-    @page{size:A3 landscape;margin:9mm;}
-    .bar,.tablecard,.hint,.sub,.kicker{display:none!important;}
-    #diagram{display:block!important;}
-    html,body{background:#fff;} .wrap{max-width:none;padding:0;}
-    .l1,.project{box-shadow:none;} .col,.l2wrap{break-inside:avoid;}
-  }
+  .foot{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:28px;border-top:1px solid var(--line);padding-top:14px;}
+  .foot b{color:var(--ink);font-family:"Sora";}
+  @media (max-width:1024px){.branches{grid-template-columns:repeat(2,1fr);}.rail,.trunk,.col::before{display:none;}}
+  @media (max-width:560px){.branches{grid-template-columns:1fr;}}
+  @media print{@page{size:A3 landscape;margin:9mm;}.topline,.banner,.foot,.sub,.kicker,.btn,.nav{display:none!important;}
+    html,body{background:#fff;}.wrap{max-width:none;padding:0;}.l1,.project{box-shadow:none;}.col,.l2wrap{break-inside:avoid;}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <nav class="nav" style="display:flex;gap:8px;margin-bottom:16px;font-family:Sora,sans-serif;font-size:.8rem"><a class="cur" href="index.html" style="text-decoration:none;border:1px solid #4a41ab;border-radius:9px;padding:7px 12px;background:#4a41ab;color:#fff">◧ Diagrama WBS</a><a href="storymap.html" style="text-decoration:none;border:1px solid #d3d9e4;border-radius:9px;padding:7px 12px;background:#fff;color:#616a7d">▤ Story Map</a></nav>
   <p class="kicker">ITM · Esp. Ingeniería de Software · Gestión de Proyectos</p>
-  <h1>Gestor de WBS / EDT — Tutor Inteligente ITM</h1>
-  <p class="sub">Edita entregables, subentregables y paquetes de trabajo; importa/exporta el Excel; imprime a PDF. Los códigos (1, 1.1, 1.1.1) se renumeran solos. Los cambios se guardan automáticamente cuando el entorno lo permite.</p>
-
-  <div class="bar">
-    <div class="seg">
-      <button id="vTabla" class="on" onclick="setView('tabla')">Tabla (editar)</button>
-      <button id="vDiag" onclick="setView('diagrama')">Diagrama</button>
+  <h1>WBS / EDT — Tutor Inteligente ITM (ITMentorSoft)</h1>
+  <p class="sub">Estructura de Desglose del Trabajo del MVP. Este diagrama se genera automáticamente a partir del archivo Excel del repositorio; para actualizarlo, se reemplaza ese archivo. Las cuatro ramas se descomponen de forma consistente hasta el Nivel 3.</p>
+  <div class="topline">
+    <div class="legend">
+      <span><i class="swatch s0"></i>Nivel 0 · Proyecto</span>
+      <span><i class="swatch s1"></i>Nivel 1 · Entregables</span>
+      <span><i class="swatch s2"></i>Nivel 2 · Subentregables</span>
+      <span><i class="swatch s3"></i>Nivel 3 · Paquetes de trabajo</span>
     </div>
-    <button class="btn primary" onclick="addBranch()">＋ Entregable principal</button>
-    <label class="btn" for="imp">⬆ Importar Excel</label>
-    <input id="imp" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(event)">
-    <button class="btn" onclick="exportXlsx()">⬇ Exportar Excel</button>
-    <button class="btn" onclick="exportCsv()">⬇ CSV</button>
-    <button class="btn" onclick="printit()">🖨 Imprimir / PDF</button>
-    <button class="btn warn" onclick="resetAll()">↺ Restablecer</button>
-    <span class="spacer"></span>
-    <span class="status" id="status">…</span>
+    <button class="btn" onclick="window.print()">🖨 Imprimir / PDF</button>
   </div>
-
-  <div id="table"></div>
-
-  <div id="diagram">
-    <div class="project"><div class="c">0 · Proyecto</div><div class="n" id="pname"></div><div class="d" id="pdesc"></div></div>
-    <div class="trunk"></div><div class="rail"></div>
-    <div class="branches" id="branches"></div>
-  </div>
-
-  <p class="hint">
-    <b>Gestión &amp; publicación:</b> tus cambios se guardan automáticamente en este artefacto. Para compartirlo y que otros lo gestionen, usa el botón <b>Compartir / Publicar</b> del artefacto (esquina superior) para generar un enlace. Usa <b>Exportar Excel</b> para respaldar o entregar los datos, e <b>Importar Excel</b> para volver a cargarlos. La rama <b>4. Pruebas</b> es la que baja a Nivel 3 en 4.4 (No funcionales) agrupando los 14 RNF.
-  </p>
+  <div id="banner" class="banner"></div>
+  <div id="content"><div class="loading">Cargando diagrama desde el Excel…</div></div>
+  <p class="foot"><b>Fuente de datos:</b> <code>data/WBS_Tutor_Inteligente_ITM.xlsx</code>. Para modificar el WBS, edita ese Excel (columnas <i>Código · Nivel · Entregable/… · Rama</i>; la jerarquía se deduce del Código) y publícalo de nuevo. La rama <b>4. Pruebas</b> baja a Nivel 3 en 4.4 (No funcionales) agrupando los 14 RNF ISO/IEC 25010.</p>
 </div>
-
 <script>
-const DEFAULT = {"name": "Tutor Inteligente ITM", "desc": "Diagnóstico adaptativo + rutas de aprendizaje personalizadas (MVP)", "children": [{"name": "Gestión del Proyecto", "children": [{"name": "Inicio y planificación", "children": [{"name": "Acta de constitución / definición de alcance (MVP)", "children": []}, {"name": "Cronograma y plan de releases (MVP / R2 / R3)", "children": []}, {"name": "Product Backlog inicial y estimación (story points)", "children": []}, {"name": "Plan de gestión de riesgos", "children": []}]}, {"name": "Ejecución y seguimiento ágil (Scrum)", "children": [{"name": "Sprint planning", "children": []}, {"name": "Daily standups", "children": []}, {"name": "Gestión del tablero en Azure DevOps", "children": []}, {"name": "Sprint review / demo", "children": []}, {"name": "Retrospectiva", "children": []}]}, {"name": "Monitoreo y control", "children": [{"name": "Seguimiento de avance (burndown / velocity)", "children": []}, {"name": "Control de cambios", "children": []}, {"name": "Seguimiento de riesgos e impedimentos", "children": []}, {"name": "Aseguramiento de calidad del proceso (DoD)", "children": []}]}, {"name": "Gestión académica del trabajo de grado", "children": [{"name": "Entregables de seminario", "children": []}, {"name": "Documento de trabajo de grado", "children": []}, {"name": "Reuniones con asesor / director", "children": []}, {"name": "Preparación de la sustentación", "children": []}]}, {"name": "Cierre", "children": [{"name": "Aceptación del MVP y lecciones aprendidas", "children": []}, {"name": "Entrega final y archivo del proyecto", "children": []}, {"name": "Retrospectiva global del proyecto", "children": []}]}]}, {"name": "Requisitos y análisis", "children": [{"name": "Elicitación de requisitos", "children": [{"name": "Instrumentos de encuesta (docentes y estudiantes)", "children": []}, {"name": "Análisis del problema y necesidades", "children": []}]}, {"name": "Requisitos funcionales (RF)", "children": []}, {"name": "Historias de usuario y backlog priorizado", "children": []}, {"name": "Requisitos no funcionales (ISO/IEC 25010)", "children": [{"name": "Catálogo de RNF (14 requisitos)", "children": []}, {"name": "Priorización de atributos de calidad (pesos 0–5)", "children": []}]}, {"name": "Criterios de aceptación", "children": []}]}, {"name": "Diseño", "children": [{"name": "Arquitectura de la solución", "children": [{"name": "Diagrama de arquitectura de alto nivel (4 módulos · SPA + API REST · API + worker · CQRS/colas)", "children": []}]}, {"name": "Decisiones arquitectónicas (ADR) y stack", "children": []}, {"name": "Modelo de datos", "children": []}, {"name": "Diseño del modelo evaluativo y rúbricas", "children": [{"name": "Rúbricas y contexto de evaluación (contexto, resp. correcta/incorrecta, palabras clave, resp. del estudiante)", "children": []}, {"name": "Criterios de clasificación por niveles (LLM juez)", "children": []}, {"name": "Algoritmo de selección de rutas", "children": []}]}, {"name": "Mockups de baja fidelidad", "children": []}]}, {"name": "Desarrollo", "children": [{"name": "Módulo Gestión de Usuarios", "children": [{"name": "Backend (auth, RBAC, MFA-OTP)", "children": []}, {"name": "Frontend (registro, login, perfil)", "children": []}]}, {"name": "Módulo Evaluación de Conocimientos", "children": [{"name": "Backend (cuestionarios, autosave)", "children": []}, {"name": "Evaluación con LLM juez (envío de contexto + rúbrica)", "children": []}, {"name": "Frontend (vista de evaluación)", "children": []}]}, {"name": "Módulo Clasificación y Diagnóstico", "children": [{"name": "Lógica de clasificación por niveles (a partir del LLM juez)", "children": []}, {"name": "Servicio de clasificación e historial de evolución", "children": []}]}, {"name": "Módulo Recomendación de Rutas de Aprendizaje", "children": [{"name": "Backend (asignación de rutas, recursos)", "children": []}, {"name": "Frontend (vistas de ruta, progreso, retroalimentación)", "children": []}]}, {"name": "Infraestructura y componentes transversales", "children": [{"name": "API REST y configuración de entorno", "children": []}, {"name": "Worker de mensajería (colas durables, reintentos)", "children": []}, {"name": "Worker de LLM", "children": []}, {"name": "Audit trail / trazabilidad", "children": []}, {"name": "Failover del proveedor LLM", "children": []}]}]}, {"name": "Pruebas", "children": [{"name": "Pruebas unitarias", "children": []}, {"name": "Pruebas de integración", "children": []}, {"name": "Pruebas funcionales (validación de HU)", "children": []}, {"name": "Pruebas no funcionales", "children": [{"name": "Seguridad (NFR-01, 02, 03, 10)", "children": []}, {"name": "Fiabilidad: tolerancia a fallos y recuperación (NFR-04, 05, 06, 13, 14)", "children": []}, {"name": "Disponibilidad (NFR-11, 12)", "children": []}, {"name": "Rendimiento / carga", "children": []}]}, {"name": "Pruebas de aceptación (UAT con docentes)", "children": []}, {"name": "Corrección de defectos", "children": []}]}]};
-const KEY = 'wbs_itm_v1';
+const FALLBACK = {"name": "Tutor Inteligente ITM", "desc": "Diagnóstico adaptativo + rutas de aprendizaje personalizadas (MVP)", "children": [{"name": "Gestión del Proyecto", "children": [{"name": "Creación de acta de constitución del proyecto", "children": [{"name": "Definición de objetivos y alcance del MVP", "children": []}, {"name": "Identificación de interesados y roles del equipo", "children": []}, {"name": "Supuestos, restricciones y criterios de éxito", "children": []}, {"name": "Aprobación del acta con el asesor/director", "children": []}]}, {"name": "Desarrollar cronograma", "children": [{"name": "Definición de sprints (8 sprints) y releases (MVP / R2 / R3)", "children": []}, {"name": "Product Backlog inicial y estimación (story points)", "children": []}, {"name": "Hitos académicos (entregas de seminario y sustentación)", "children": []}, {"name": "Configuración del tablero en Azure DevOps", "children": []}]}, {"name": "Gestión de riesgos", "children": [{"name": "Identificación de riesgos (LLM, disponibilidad, seguridad, alcance)", "children": []}, {"name": "Análisis y priorización (probabilidad × impacto)", "children": []}, {"name": "Planes de mitigación / contingencia (failover LLM, colas, RBAC/MFA)", "children": []}, {"name": "Seguimiento de riesgos e impedimentos", "children": []}]}, {"name": "Monitoreo de progreso", "children": [{"name": "Seguimiento de sprints (burndown / velocity)", "children": []}, {"name": "Ceremonias Scrum (planning, daily, review, retro)", "children": []}, {"name": "Control de cambios (change requests)", "children": []}, {"name": "Reportes de avance y reuniones con el asesor", "children": []}, {"name": "Cierre y lecciones aprendidas", "children": []}]}]}, {"name": "Requisitos y análisis", "children": [{"name": "Elicitación de requisitos", "children": [{"name": "Instrumentos de encuesta (docentes y estudiantes)", "children": []}, {"name": "Análisis del problema y necesidades", "children": []}]}, {"name": "Requisitos funcionales (RF)", "children": []}, {"name": "Historias de usuario y backlog priorizado", "children": []}, {"name": "Requisitos no funcionales (ISO/IEC 25010)", "children": [{"name": "Catálogo de RNF (14 requisitos)", "children": []}, {"name": "Priorización de atributos de calidad (pesos 0–5)", "children": []}]}, {"name": "Criterios de aceptación", "children": []}]}, {"name": "Diseño", "children": [{"name": "Arquitectura de la solución", "children": [{"name": "Diagrama de arquitectura de alto nivel (4 módulos · SPA + API REST · API + worker · CQRS/colas)", "children": []}]}, {"name": "Decisiones arquitectónicas (ADR) y stack", "children": []}, {"name": "Modelo de datos", "children": []}, {"name": "Diseño del modelo evaluativo y rúbricas", "children": [{"name": "Rúbricas y contexto de evaluación (contexto, resp. correcta/incorrecta, palabras clave, resp. del estudiante)", "children": []}, {"name": "Criterios de clasificación por niveles (LLM juez)", "children": []}, {"name": "Algoritmo de selección de rutas", "children": []}]}, {"name": "Mockups de baja fidelidad", "children": []}]}, {"name": "Desarrollo", "children": [{"name": "Módulo Gestión de Usuarios", "children": [{"name": "Backend (auth, RBAC, MFA-OTP)", "children": []}, {"name": "Frontend (registro, login, perfil)", "children": []}]}, {"name": "Módulo Evaluación de Conocimientos", "children": [{"name": "Backend (cuestionarios, autosave)", "children": []}, {"name": "Evaluación con LLM juez (envío de contexto + rúbrica)", "children": []}, {"name": "Frontend (vista de evaluación)", "children": []}]}, {"name": "Módulo Clasificación y Diagnóstico", "children": [{"name": "Lógica de clasificación por niveles (a partir del LLM juez)", "children": []}, {"name": "Servicio de clasificación e historial de evolución", "children": []}]}, {"name": "Módulo Recomendación de Rutas de Aprendizaje", "children": [{"name": "Backend (asignación de rutas, recursos)", "children": []}, {"name": "Frontend (vistas de ruta, progreso, retroalimentación)", "children": []}]}, {"name": "Infraestructura y componentes transversales", "children": [{"name": "API REST y configuración de entorno", "children": []}, {"name": "Worker de mensajería (colas durables, reintentos)", "children": []}, {"name": "Worker de LLM", "children": []}, {"name": "Audit trail / trazabilidad", "children": []}, {"name": "Failover del proveedor LLM", "children": []}]}]}, {"name": "Pruebas", "children": [{"name": "Pruebas unitarias", "children": []}, {"name": "Pruebas de integración", "children": []}, {"name": "Pruebas funcionales (validación de HU)", "children": []}, {"name": "Pruebas no funcionales", "children": [{"name": "Seguridad (NFR-01, 02, 03, 10)", "children": []}, {"name": "Fiabilidad: tolerancia a fallos y recuperación (NFR-04, 05, 06, 13, 14)", "children": []}, {"name": "Disponibilidad (NFR-11, 12)", "children": []}, {"name": "Rendimiento / carga", "children": []}]}, {"name": "Pruebas de aceptación (UAT con docentes)", "children": []}, {"name": "Corrección de defectos", "children": []}]}]};
+const XLSX_URL = "data/WBS_Tutor_Inteligente_ITM.xlsx";
 const ICONS = ['🔍','✏️','⚙️','✅','📦','🚀','📊','🔧'];
-let state = { tree: JSON.parse(JSON.stringify(DEFAULT)), view:'tabla' };
-let hasStorage = false;
 
-function clone(o){ return JSON.parse(JSON.stringify(o)); }
-function setStatus(t, ok){ const s=document.getElementById('status'); s.innerHTML = ok? '<b>'+t+'</b>':t; }
+function esc(s){ return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+function banner(msg){ const b=document.getElementById('banner'); b.textContent=msg; b.style.display='block'; }
 
-async function init(){
-  hasStorage = (typeof window !== 'undefined' && !!window.storage);
-  if(hasStorage){
-    try{ const r = await window.storage.get(KEY); if(r && r.value){ state.tree = JSON.parse(r.value); } }
-    catch(e){ /* first run: key not found */ }
+function treeFromAOA(aoa){
+  let hi=-1,cCode=0,cElem=2;
+  for(let r=0;r<aoa.length;r++){
+    const row=aoa[r].map(x=>String(x).trim());
+    const idx=row.findIndex(x=>x.toLowerCase().startsWith('código')||x.toLowerCase().startsWith('codigo'));
+    if(idx>=0){ hi=r; cCode=idx; const ei=row.findIndex(x=>/entregable|elemento|subentregable|paquete/i.test(x)); if(ei>=0)cElem=ei; break; }
   }
-  render();
-  setStatus(hasStorage ? 'Guardado ✓' : 'Sin persistencia — usa Exportar', hasStorage);
-}
-let t;
-function save(){
-  if(!hasStorage){ setStatus('Sin persistencia — usa Exportar', false); return; }
-  setStatus('Guardando…');
-  clearTimeout(t);
-  t = setTimeout(async ()=>{
-    try{ await window.storage.set(KEY, JSON.stringify(state.tree)); setStatus('Guardado ✓', true); }
-    catch(e){ setStatus('No se pudo guardar — usa Exportar', false); }
-  }, 350);
-}
-
-/* ---- path helpers ---- */
-function getByPath(p){
-  let parentArr = state.tree.children, node=null, parent=state.tree;
-  for(let i=0;i<p.length;i++){
-    parent = (i===0)? state.tree : node;
-    node = parentArr[p[i]];
-    if(i<p.length-1) parentArr = node.children;
+  if(hi<0) return null;
+  const t={name:"Tutor Inteligente ITM",desc:"Diagnóstico adaptativo + rutas de aprendizaje personalizadas (MVP)",children:[]};
+  const map={};
+  for(let r=hi+1;r<aoa.length;r++){
+    const code=String(aoa[r][cCode]||'').trim();
+    const elem=String(aoa[r][cElem]||'').trim();
+    if(!code||!elem) continue;
+    if(code==='0'){ t.name=elem.replace(/^proyecto:\s*/i,''); continue; }
+    if(!/^\d+(\.\d+)*$/.test(code)) continue;
+    const node={name:elem,children:[]}; map[code]=node;
+    const parts=code.split('.');
+    if(parts.length===1){ t.children.push(node); }
+    else { const pc=parts.slice(0,-1).join('.'); (map[pc]?map[pc].children:t.children).push(node); }
   }
-  const arr = (p.length===1)? state.tree.children : parent.children;
-  return { node, arr, idx:p[p.length-1] };
-}
-function addChild(p){ const {node}=getByPath(p); node.children.push({name:'Nuevo elemento',children:[]}); render(); save(); }
-function addSibling(p){ const {arr,idx}=getByPath(p); arr.splice(idx+1,0,{name:'Nuevo elemento',children:[]}); render(); save(); }
-function del(p){ const {arr,idx,node}=getByPath(p);
-  if(confirm('¿Eliminar "'+node.name+'"'+(node.children.length?' y sus '+node.children.length+' subelementos?':'?'))){ arr.splice(idx,1); render(); save(); } }
-function move(p,d){ const {arr,idx}=getByPath(p); const j=idx+d; if(j<0||j>=arr.length) return;
-  [arr[idx],arr[j]]=[arr[j],arr[idx]]; render(); save(); }
-function rename(p,val){ const {node}=getByPath(p); node.name=val; save(); }
-function addBranch(){ state.tree.children.push({name:'Nuevo entregable',children:[]}); render(); save(); }
-
-/* ---- render table ---- */
-function render(){
-  document.getElementById('table').style.display = state.view==='tabla'?'block':'none';
-  document.getElementById('diagram').style.display = state.view==='diagrama'?'block':'none';
-  document.getElementById('vTabla').classList.toggle('on', state.view==='tabla');
-  document.getElementById('vDiag').classList.toggle('on', state.view==='diagrama');
-  if(state.view==='tabla') renderTable(); else renderDiagram();
+  return t.children.length? t : null;
 }
 
-function renderTable(){
-  const rows=[];
-  function walk(children, path, prefix, level, bIdx){
-    children.forEach((n,i)=>{
-      const code = prefix? prefix+'.'+(i+1) : String(i+1);
-      const bi = level===1 ? i : bIdx;
-      rows.push(rowHTML(n, path.concat(i), code, level, bi));
-      if(n.children && n.children.length) walk(n.children, path.concat(i), code, level+1, bi);
-    });
-  }
-  walk(state.tree.children, [], '', 1, 0);
-  document.getElementById('table').innerHTML =
-    '<div class="tablecard"><table><thead><tr>'+
-    '<th style="width:74px">Código</th><th style="width:44px">Nivel</th>'+
-    '<th>Entregable / Subentregable / Paquete de trabajo</th>'+
-    '<th style="width:150px">Rama</th><th style="width:170px">Acciones</th>'+
-    '</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
-}
-function rowHTML(n, path, code, level, bIdx){
-  const c = (bIdx%5)+1;
-  const cls = level===1?'lvl1':(level===2?'lvl2':'lvl3');
-  const style = 'style="--rowc:var(--c'+c+');--rowt:var(--c'+c+'t)"';
-  const ind = (level-1)*18;
-  const rama = branchName(bIdx);
-  const ps = JSON.stringify(path);
-  return '<tr class="'+cls+'" '+style+'>'+
-    '<td class="code">'+code+'</td>'+
-    '<td><span class="lvlpill">'+level+'</span></td>'+
-    '<td class="indent" style="--ind:'+ind+'px"><input class="name" value="'+escAttr(n.name)+'" oninput="rename('+ps+',this.value)"></td>'+
-    '<td class="ramacell">'+escHtml(rama)+'</td>'+
-    '<td><div class="acts">'+
-      '<button class="ic" title="Agregar subelemento" onclick=\'addChild('+ps+')\'>＋</button>'+
-      '<button class="ic" title="Agregar elemento igual debajo" onclick=\'addSibling('+ps+')\'>⎘</button>'+
-      '<button class="ic" title="Subir" onclick=\'move('+ps+',-1)\'>↑</button>'+
-      '<button class="ic" title="Bajar" onclick=\'move('+ps+',1)\'>↓</button>'+
-      '<button class="ic del" title="Eliminar" onclick=\'del('+ps+')\'>🗑</button>'+
-    '</div></td></tr>';
-}
-function branchName(bIdx){ const b=state.tree.children[bIdx]; return b? (bIdx+1)+'. '+b.name : ''; }
-
-/* ---- render diagram ---- */
-function renderDiagram(){
-  document.getElementById('pname').textContent = state.tree.name;
-  document.getElementById('pdesc').textContent = state.tree.desc || '';
-  const host = document.getElementById('branches');
-  host.style.setProperty('--ncols', Math.max(1, state.tree.children.length));
-  host.innerHTML = state.tree.children.map((b,i)=>{
-    const c=(i%5)+1, code=String(i+1), ico=ICONS[i%ICONS.length];
-    const items=(b.children||[]).map((s,j)=>{
-      const scode=code+'.'+(j+1);
-      const kids=(s.children&&s.children.length)?
-        '<div class="kids">'+subTree(s.children, scode)+'</div>':'';
-      return '<div class="l2wrap"><div class="l2"><b>'+scode+'</b>'+escHtml(s.name)+'</div>'+kids+'</div>';
-    }).join('');
-    return '<div class="col b'+c+'"><div class="l1"><span class="ico">'+ico+'</span>'+
-      '<div><div class="code">'+code+'</div><div class="ttl">'+escHtml(b.name)+'</div></div></div>'+
-      '<div class="items">'+items+'</div></div>';
-  }).join('');
-}
-function subTree(children, prefix){
-  return children.map((g,k)=>{
-    const gcode=prefix+'.'+(k+1);
-    const nested=(g.children&&g.children.length)?'<div class="kids">'+subTree(g.children,gcode)+'</div>':'';
-    return '<div class="l3"><b>'+gcode+'</b>'+escHtml(g.name)+'</div>'+nested;
-  }).join('');
-}
-
-/* ---- import / export ---- */
-function importFile(ev){
-  const f=ev.target.files[0]; if(!f) return;
-  const rd=new FileReader();
-  rd.onload=(e)=>{
-    try{
-      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
-      let hi=-1,cCode=0,cElem=2,cNivel=1;
-      for(let r=0;r<aoa.length;r++){
-        const row=aoa[r].map(x=>String(x).trim());
-        const idx=row.findIndex(x=>x.toLowerCase().startsWith('código')||x.toLowerCase().startsWith('codigo'));
-        if(idx>=0){ hi=r; cCode=idx;
-          const ei=row.findIndex(x=>/entregable|elemento|subentregable|paquete/i.test(x)); if(ei>=0)cElem=ei;
-          const ni=row.findIndex(x=>x.toLowerCase().startsWith('nivel')); if(ni>=0)cNivel=ni;
-          break; }
-      }
-      if(hi<0){ alert('No encontré la fila de encabezados (Código / Elemento). Usa el Excel exportado por esta herramienta.'); return; }
-      const nt={name:state.tree.name,desc:state.tree.desc,children:[]}; const map={};
-      for(let r=hi+1;r<aoa.length;r++){
-        const code=String(aoa[r][cCode]||'').trim();
-        const elem=String(aoa[r][cElem]||'').trim();
-        if(!code||!elem) continue;
-        if(code==='0'){ nt.name=elem; continue; }
-        const node={name:elem,children:[]}; map[code]=node;
-        const parts=code.split('.');
-        if(parts.length===1){ nt.children.push(node); }
-        else{ const pc=parts.slice(0,-1).join('.'); (map[pc]?map[pc].children:nt.children).push(node); }
-      }
-      if(!nt.children.length){ alert('El archivo no contenía filas de datos reconocibles.'); return; }
-      state.tree=nt; render(); save(); setStatus('Importado ✓', true);
-    }catch(err){ alert('No pude leer el archivo: '+err.message); }
-  };
-  rd.readAsArrayBuffer(f); ev.target.value='';
-}
-function buildAOA(){
-  const aoa=[['Código','Nivel','Entregable / Subentregable / Paquete de trabajo','Rama']];
-  aoa.push(['0',0,state.tree.name,'']);
-  (function walk(children,prefix,level,bIdx){
-    children.forEach((n,i)=>{
-      const code=prefix?prefix+'.'+(i+1):String(i+1);
-      const bi=level===1?i:bIdx;
-      aoa.push([code,level,n.name,branchName(bi)]);
-      if(n.children&&n.children.length) walk(n.children,code,level+1,bi);
-    });
-  })(state.tree.children,'',1,0);
-  return aoa;
-}
-function download(blob,name){
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
-  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
-}
-function exportXlsx(){
+async function load(){
+  if(typeof XLSX==='undefined'){ banner('No se pudo cargar la librería de lectura de Excel (sin conexión). Mostrando la versión incluida.'); return render(FALLBACK); }
   try{
-    const ws=XLSX.utils.aoa_to_sheet(buildAOA());
-    ws['!cols']=[{wch:10},{wch:6},{wch:82},{wch:16}];
-    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'WBS EDT');
-    const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-    download(new Blob([out],{type:'application/octet-stream'}),'WBS_Tutor_Inteligente_ITM.xlsx');
-    setStatus('Excel exportado ✓', true);
-  }catch(e){ alert('Exportación no disponible en este entorno: '+e.message); }
+    const res=await fetch(XLSX_URL+'?v='+Date.now(),{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const buf=await res.arrayBuffer();
+    const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+    const t=treeFromAOA(aoa);
+    if(!t){ banner('El Excel no tiene el formato esperado; mostrando la versión incluida.'); return render(FALLBACK); }
+    render(t);
+  }catch(e){
+    banner('No se pudo leer el Excel del repositorio (¿abriste el archivo localmente en vez de por el enlace web?). Mostrando la versión incluida.');
+    render(FALLBACK);
+  }
 }
-function exportCsv(){
-  const ws=XLSX.utils.aoa_to_sheet(buildAOA());
-  const csv=XLSX.utils.sheet_to_csv(ws);
-  download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),'WBS_Tutor_Inteligente_ITM.csv');
-  setStatus('CSV exportado ✓', true);
+
+function subTree(children,prefix){
+  return children.map((g,k)=>{ const gcode=prefix+'.'+(k+1);
+    const nested=(g.children&&g.children.length)?'<div class="kids">'+subTree(g.children,gcode)+'</div>':'';
+    return '<div class="l3"><b>'+gcode+'</b>'+esc(g.name)+'</div>'+nested; }).join('');
 }
-function printit(){ const prev=state.view; state.view='diagrama'; render(); setTimeout(()=>{window.print(); state.view=prev; render();},250); }
-function resetAll(){ if(confirm('Restablecer a la versión base? Se perderán tus cambios guardados.')){ state.tree=clone(DEFAULT); render(); save(); setStatus('Restablecido', true); } }
-function setView(v){ state.view=v; render(); }
-
-function escHtml(s){ return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-function escAttr(s){ return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
-
-init();
+function render(t){
+  const cols=(t.children||[]).map((b,i)=>{
+    const c=(i%5)+1,code=String(i+1),ico=ICONS[i%ICONS.length];
+    const items=(b.children||[]).map((s,j)=>{ const scode=code+'.'+(j+1);
+      const kids=(s.children&&s.children.length)?'<div class="kids">'+subTree(s.children,scode)+'</div>':'';
+      return '<div class="l2wrap"><div class="l2"><b>'+scode+'</b>'+esc(s.name)+'</div>'+kids+'</div>'; }).join('');
+    return '<div class="col b'+c+'"><div class="l1"><span class="ico">'+ico+'</span><div><div class="code">'+code+'</div><div class="ttl">'+esc(b.name)+'</div></div></div><div class="items">'+items+'</div></div>';
+  }).join('');
+  const ncols=Math.max(1,(t.children||[]).length);
+  document.getElementById('content').innerHTML=
+    '<div class="project"><div class="c">0 · Proyecto</div><div class="n">'+esc(t.name)+'</div><div class="d">'+esc(t.desc||'')+'</div></div>'+
+    '<div class="trunk"></div><div class="rail"></div>'+
+    '<div class="branches" style="--ncols:'+ncols+'">'+cols+'</div>';
+}
+load();
 </script>
 </body>
 </html>
