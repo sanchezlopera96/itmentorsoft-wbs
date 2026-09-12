@@ -1,73 +1,65 @@
-# Gestor de WBS / EDT — Tutor Inteligente ITM
+# WBS + Story Map — Tutor Inteligente ITM
 
-Aplicación web de una sola página para **visualizar y gestionar** la Estructura de Desglose del Trabajo (WBS / EDT) del proyecto *Tutor Inteligente ITM (ITMentorSoft)*. Permite editar entregables, subentregables y paquetes de trabajo, renumerar los códigos automáticamente (1 → 1.1 → 1.1.1), importar y exportar el Excel, y exportar a PDF.
+Sitio estático (una carpeta, sin servidor) con **dos vistas** del proyecto *Tutor Inteligente ITM (ITMentorSoft)*, publicable en **GitHub Pages**:
 
-No requiere servidor ni compilación: es un único `index.html` estático, ideal para **GitHub Pages**.
+- **`index.html`** — Diagrama **WBS / EDT** (solo lectura). Lee `data/WBS_Tutor_Inteligente_ITM.xlsx`.
+- **`storymap.html`** — **Story Map** (solo lectura). Lee `data/backlog.csv` (export de Azure DevOps).
 
----
+Ambas páginas están enlazadas entre sí por una barra de navegación y son **solo de lectura**: nadie modifica el contenido desde el navegador. Para actualizar, se **reemplaza el archivo de datos** correspondiente y se publica de nuevo.
 
-## Publicar en GitHub Pages (opción sin usar la terminal)
-
-1. Entra a <https://github.com> e inicia sesión. Crea un repositorio nuevo con **New → Repository** (por ejemplo `wbs-tutor-itm`). Puede ser público o privado (con privado, Pages requiere plan de pago para verse externamente; para una entrega académica, público suele bastar).
-2. En el repositorio vacío, pulsa **Add file → Upload files** y arrastra el contenido de esta carpeta: `index.html`, `.nojekyll` y la carpeta `data/`. Confirma con **Commit changes**.
-3. Ve a **Settings → Pages** (menú lateral).
-4. En **Build and deployment → Source** elige **Deploy from a branch**. En **Branch** selecciona `main` y la carpeta `/ (root)`. Pulsa **Save**.
-5. Espera 1–2 minutos y recarga. GitHub mostrará el enlace público, del tipo:
-   `https://TU-USUARIO.github.io/wbs-tutor-itm/`
-6. Comparte ese enlace. Cualquiera puede abrir el gestor; los cambios de cada persona se guardan en **su** navegador (ver "Cómo se guardan los datos").
-
-## Publicar con Git (terminal)
-
-```bash
-git init
-git add .
-git commit -m "WBS Tutor Inteligente ITM"
-git branch -M main
-git remote add origin https://github.com/TU-USUARIO/wbs-tutor-itm.git
-git push -u origin main
-```
-
-Luego activa Pages como en los pasos 3–5 de arriba.
+URL del proyecto: **https://sanchezlopera96.github.io/itmentorsoft-wbs/**
 
 ---
 
-## Uso
+## Actualizar el WBS
 
-- **Tabla (editar):** cambia el nombre de cualquier fila; usa los botones de cada fila para
-  `＋` agregar subelemento, `⎘` agregar un elemento hermano debajo, `↑`/`↓` reordenar y `🗑` eliminar.
-  Los códigos WBS se recalculan solos.
-- **＋ Entregable principal:** agrega una rama nueva de Nivel 1.
-- **Diagrama:** vista de árbol con colores por rama.
-- **⬆ Importar Excel / ⬇ Exportar Excel / ⬇ CSV:** intercambio de datos con el archivo
-  (columnas `Código · Nivel · Entregable/… · Rama`). El Excel es la fuente de datos para respaldar o entregar.
-- **🖨 Imprimir / PDF:** imprime el diagrama en A3 horizontal (elige "Guardar como PDF").
-- **↺ Restablecer:** vuelve a la versión base incluida.
+1. Edita `data/WBS_Tutor_Inteligente_ITM.xlsx` (columnas `Código · Nivel · Entregable/… · Rama`; la jerarquía se deduce del `Código`: `1` → `1.1` → `1.1.1`). La fila `Código = 0` es el nombre del proyecto.
+2. Guarda con el mismo nombre en `data/`.
+3. En GitHub Desktop: *Changes* → *Commit to main* → *Push origin*.
+4. Recarga la página en ~1 minuto.
 
-## Cómo se guardan los datos
+## Actualizar el Story Map
 
-Los cambios se guardan en el **almacenamiento local del navegador** (`localStorage`) de quien edita.
-Esto significa:
+1. En Azure DevOps (Boards / Backlog) exporta los work items a **CSV** incluyendo las columnas:
+   `ID, Title, Work Item Type, State, Effort, Iteration Path, Tags`.
+2. Renombra el archivo a **`backlog.csv`** y reemplázalo en `data/`.
+3. Commit + Push. Recarga `storymap.html`.
 
-- No se sincronizan automáticamente entre distintas personas ni dispositivos.
-- Para compartir un estado concreto, usa **Exportar Excel** y pásalo; la otra persona hace **Importar Excel**.
-- Para **edición colaborativa en tiempo real** haría falta un backend (base de datos + API). Mientras
-  tanto, el patrón recomendado es mantener el Excel en una unidad compartida (Google Drive / SharePoint)
-  como única fuente de verdad, y usar el gestor para editar e importar/exportar.
+Cómo se interpreta el backlog:
+
+- La **jerarquía se arma por orden y tipo**: `Epic` (Tema) → `Feature` (Épica) → `Product Backlog Item` (HU) → `Task`.
+- Cada **HU** es una tarjeta; se ubica en la columna de su Épica y en la **fila de su sprint** (número tomado de *Iteration Path*, p. ej. `…\Sprint 4`).
+- La etiqueta **MVP** (columna *Tags*) resalta la tarjeta en dorado.
+- El nº de **tareas** de cada HU se cuenta a partir de sus filas `Task`.
+- El **título** de la HU se toma de *Title* quitando el prefijo `HU x.y.z`.
+
+> El export también acepta `.xlsx`; si lo prefieres, guarda el archivo como `data/backlog.csv` de todos modos (el visor lee ambos formatos, pero el nombre debe ser `backlog.csv`) o ajusta la constante `CSV_URL` dentro de `storymap.html`.
+
+---
+
+## Publicar en GitHub Pages
+
+1. Sube el contenido de esta carpeta al repositorio (con `index.html` en la **raíz**).
+2. **Settings → Pages → Source → Deploy from a branch**, rama `main`, carpeta `/ (root)`, **Save**.
+3. La URL será `https://TU-USUARIO.github.io/TU-REPO/`.
+
+---
 
 ## Estructura de la carpeta
 
 ```
 .
-├── index.html                     # la aplicación (todo incluido)
-├── .nojekyll                      # evita el procesamiento Jekyll de GitHub Pages
+├── index.html                              # Diagrama WBS (lee el Excel)
+├── storymap.html                           # Story Map (lee el backlog)
+├── .nojekyll
 ├── data/
-│   └── WBS_Tutor_Inteligente_ITM.xlsx   # WBS con formato (respaldo de datos)
+│   ├── WBS_Tutor_Inteligente_ITM.xlsx      # FUENTE del WBS
+│   └── backlog.csv                         # FUENTE del Story Map (export Azure DevOps)
 └── README.md
 ```
 
 ## Notas técnicas
 
-- Librería de Excel: **SheetJS (xlsx)** cargada desde cdnjs (requiere conexión a internet).
-- Tipografías: Google Fonts (Sora / Inter); si no hay red, usa las del sistema.
-- La rama **4. Pruebas** es la que baja a Nivel 3 en **4.4 Pruebas no funcionales**, agrupando los 14
-  requisitos no funcionales por característica de calidad ISO/IEC 25010.
+- Ambas páginas leen los datos con **SheetJS (xlsx)** desde cdnjs (requiere internet).
+- Abiertas por doble clic (`file://`) el navegador bloquea la lectura del archivo y muestran una **versión de respaldo incluida**; publicadas en GitHub Pages (`https://`) leen los datos con normalidad.
+- Botón **Imprimir / PDF** en cada página (A3 horizontal).
